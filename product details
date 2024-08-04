@@ -1,1 +1,41 @@
+import pandas as pd
+import qrcode
+from datetime import datetime
 
+# Load the Excel file
+file_path = 'products.xlsx'
+df = pd.read_excel(file_path)
+
+# Create QR codes for each product
+for index, row in df.iterrows():
+    # Extract product details
+    serial_number = row['Serial Number']
+    color = row['Color']
+    date_of_manufacturing = row['Date of Manufacturing']
+    sweep_size = row['Sweep Size']
+    
+    # Create the text for the QR code
+    qr_text = (f"Serial Number: {serial_number}\n"
+               f"Color: {color}\n"
+               f"Date of Manufacturing: {date_of_manufacturing.strftime('%Y-%m-%d')}\n"
+               f"Sweep Size: {sweep_size}")
+    
+    # Generate the QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_text)
+    qr.make(fit=True)
+    
+    # Create an image from the QR Code instance
+    img = qr.make_image(fill='black', back_color='white')
+    
+    # Save the image
+    img_file_path = f'product_{serial_number}.png'
+    img.save(img_file_path)
+    print(f'QR code for product {serial_number} saved as {img_file_path}')
+
+print('QR codes generated successfully.')
